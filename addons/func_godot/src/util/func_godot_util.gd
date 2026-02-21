@@ -286,10 +286,16 @@ static func build_texture_map(entity_data: Array[FuncGodotData.EntityData], map_
 
 ## Returns UV coordinate calculated from the Valve 220 UV format.
 static func get_valve_uv(vertex: Vector3, u_axis: Vector3, v_axis: Vector3, uv_basis := Transform2D.IDENTITY, texture_size := Vector2.ONE) -> Vector2:
-	var uv := Vector2(u_axis.dot(vertex), v_axis.dot(vertex))
 	var scale := Vector2(uv_basis.x.x, uv_basis.y.y)
-	uv += (uv_basis.origin * scale)
-	uv /= scale;
+	if is_zero_approx(scale.x):
+		scale.x = 1.0
+	if is_zero_approx(scale.y):
+		scale.y = 1.0
+	var uv := Vector2(
+		u_axis.dot(vertex) / scale.x,
+		v_axis.dot(vertex) / scale.y
+	)
+	uv += uv_basis.origin
 	uv.x /= texture_size.x
 	uv.y /= texture_size.y
 	return uv
